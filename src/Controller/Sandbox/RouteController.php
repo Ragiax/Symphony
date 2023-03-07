@@ -4,6 +4,7 @@ namespace App\Controller\Sandbox;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/sandbox/route', name: 'sandbox_route')]
@@ -41,27 +42,12 @@ class RouteController extends AbstractController
         return new Response('<body>Route::withConstraint : age = ' . $age . ' (' . gettype($age) . ')</body>');
     }
 
-        //////////////// ESSAI //////////////////
-    #[Route(
-        '/with-four-constraint/{age}/{year}/{month}/{filename}/{ext}',
-        name: '_with_4_constraint',
-        requirements: ['age' => '0|[1-9]\d*'],
-        defaults: ['age' => 18],
-    )]
-    public function with4ConstraintAction(int $age, $year , $month , $filename , $ext): Response
-    {
-        dump($age);
-        return new Response(
-            '<body>Route::with4Constraint : age = ' . $age .'</br>'.
-            " Years = ". $year.'</br>'." Month = ". $month.'</br>'." Filename =".$filename.'</br>'." Ext = ".$ext.'</br>'." " . ' (' . gettype($age) .  ')</body>');
-    }
-    ////////// Fin ESSAI ///////////////
     #[Route(
         '/test1/{year}/{month}/{filename}.{ext}',
         name: '_test1',
     )]
     public function test1Action($year, $month, $filename, $ext): Response
-    { // 4 paramètre
+    {
         $args = array(
             'title' => 'test1',
             'year' => $year,
@@ -83,7 +69,7 @@ class RouteController extends AbstractController
         ],
     )]
     public function test2Action(int $year, int $month, string $filename, string $ext): Response
-    { // Mis en place des Requierement
+    {
         $args = array(
             'title' => 'test2',
             'year' => $year,
@@ -108,7 +94,7 @@ class RouteController extends AbstractController
         ],
     )]
     public function test3Action(int $year, int $month, string $filename, string $ext): Response
-    { // Mise en place des valeurs Default
+    {
         $args = array(
             'title' => 'test3',
             'year' => $year,
@@ -119,8 +105,88 @@ class RouteController extends AbstractController
         return $this->render('Sandbox/Route/test1234.html.twig', $args);
     }
 
+    #[Route(
+        '/test4/{year}/{month}/{filename}.{ext}',
+        name: '_test4',
+        requirements: [
+            'year' => '[1-9]\d{0,3}',
+            'month' => '(0?[1-9])|(1[0-2])',
+            'filename' => '[-a-zA-Z]+',
+            'ext' => 'jpg|jpeg|png|ppm',
+        ],
+        defaults: [
+            'month' => 1,
+            'filename' => 'picture',
+            'ext' => 'png',
+        ],
+    )]
+    public function test4Action(int $year, int $month, string $filename, string $ext): Response
+    {
+        $args = array(
+            'title' => 'test4',
+            'year' => $year,
+            'month' => $month,
+            'filename' => $filename,
+            'ext' => $ext,
+        );
+        return $this->render('Sandbox/Route/test1234.html.twig', $args);
+    }
+
+    #[Route(
+        '/test4/{year}',
+        name: '_test4bis',
+        requirements: [
+            'year' => '[1-9]\d{0,3}',
+        ],
+    )]
+    public function test4bisAction(int $year): Response
+    {
+        $args = array(
+            'title' => 'test4bis',
+            'year' => $year,
+        );
+        return $this->render('Sandbox/Route/test4bis.html.twig', $args);
+    }
+
+    #[Route(
+        '/permis/{age}',
+        name: '_permis',
+        requirements: [
+            'age' => '\d+',
+        ],
+    )]
+    public function permisAction(int $age): Response
+    { // crée une erreur 404
+        if ($age < 18)
+            throw new NotFoundHttpException('Vous n\'êtes pas assez âgé !');
+        return new Response('<body>Route::permis : age = ' . $age . ' (&ge; 18)</body>');
+    }
+
+    #[Route('/redirect1', name: '_redirect1')]
+    public function redirect1Action(): Response
+    {// fait une redirection
+        return $this->redirectToRoute('sandbox_prefix_hello4');
+    }
+
+    #[Route('/redirect2', name: '_redirect2')]
+    public function redirect2Action(): Response
+    {
+        $params = array(
+            'year' => 1815,
+            'month' => 12,
+            'filename' => 'ada',
+            'ext' => 'ppm',                 // tester en commentant la ligne, puis en mettant une extension interdite
+        );
+        return $this->redirectToRoute('sandbox_route_test3', $params);
+    }
+
+    #[Route('/redirect3', name: '_redirect3')]
+    public function redirect3Action(): Response
+    {
+        dump('bonjour');
+        return $this->redirectToRoute('sandbox_prefix_hello4');
+    }
 
 
 
 }
-
