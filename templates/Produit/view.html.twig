@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vente : produits</title>
+</head>
+<body>
+{# gestion dese messages flash #}
+{% set messages =  app.session.flashBag.get('info') %}
+{% if messages|length > 0 %}
+    <ul>
+        {% for msg in messages %}
+            <li>{{ msg }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h1>Site de vente : détail du produit {{ produit.id }}</h1>
+
+<ul>
+    <li>id : {{ produit.id }}</li>
+    <li>denomination : {{ produit.denomination }}</li>
+    <li>code barre : {{ produit.code }}</li>
+    <li>actif : {{ produit.actif ? 'vrai' : 'faux' }}</li>
+</ul>
+
+{{ dump(produit) }}
+</body>
+</html>
+

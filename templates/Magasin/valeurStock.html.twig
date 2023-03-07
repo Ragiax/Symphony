@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vente : magasins</title>
+</head>
+<body>
+{# gestion dese messages flash #}
+{% set messages =  app.session.flashBag.get('info') %}
+{% if messages|length > 0 %}
+    <ul>
+        {% for msg in messages %}
+            <li>{{ msg }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<h1>Site de vente : valeur du stock du magasin {{ id }}</h1>
+<p>
+    La valeur du stock est {{ total }} euros.
+</p>
+</body>
+</html>
